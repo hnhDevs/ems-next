@@ -52,8 +52,8 @@ export const UserSchema = z.object({
   totalLeaves: z.number().nonnegative().default(18),
   usedLeaves: z.number().nonnegative().default(0),
   pendingLeaves: z.number().nonnegative().default(0),
-  createdAt: z.date().optional(),
-  deletedAt: z.date().nullable().optional(),
+  createdAt: z.date().default(() => new Date()),
+  deletedAt: z.date().nullable().default(() => new Date()),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

@@ -24,7 +24,7 @@ export const HolidaySchema = z.object({
     "Compensatory",
     "Other"
   ]).default("Other"),
-  createdAt: z.date().optional(),
+  createdAt: z.date().default(() => new Date()),
 });
 
 export type HolidayType = z.infer<typeof HolidaySchema>;
