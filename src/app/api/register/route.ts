@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { dbConnect } from '@/lib/dbConnect';
-import { UserModel } from '@/model/UserModel';
-import bcrypt from 'bcryptjs';
-import { UserSchema } from '@/schemas/UserSchema';
-import { ZodError } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { dbConnect } from "@/lib/dbConnect";
+import { UserModel } from "@/model/UserModel";
+import { UserSchema } from "@/schemas/UserSchema";
+import { ZodError } from "zod";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   await dbConnect();
@@ -31,20 +31,19 @@ export async function POST(req: NextRequest) {
       role,
       department,
       position,
-      selfieUrl
+      selfieUrl,
     } = parsed;
 
     // --- Check for Existing User ---
     const existingUser = await UserModel.findOne({
-      $or: [
-        { username },
-        { email },
-        { phoneNumber }
-      ]
+      $or: [{ username }, { email }, { phoneNumber }],
     });
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with provided username, email, or phone number already exists.' },
+        {
+          error:
+            "User with provided username, email, or phone number already exists.",
+        },
         { status: 409 }
       );
     }
@@ -62,22 +61,24 @@ export async function POST(req: NextRequest) {
       role,
       department,
       position,
-      selfieUrl
+      selfieUrl,
     });
 
     await newUser.save();
     // Respond with success message
-    return NextResponse.json({ message: 'User registered successfully.' }, { status: 201 });
+    return NextResponse.json(
+      { message: "User registered successfully." },
+      { status: 201 }
+    );
   } catch (error: unknown) {
-
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
 
-    let errorMessage = 'Internal Server Error';
+    let errorMessage = "Internal Server Error";
     if (error instanceof Error) {
       errorMessage = error.message;
     }
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
-} 
+}

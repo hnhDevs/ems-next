@@ -13,10 +13,7 @@ export async function PATCH(
 
   const { id } = params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    return NextResponse.json(
-      { error: "Invalid user ID." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid user ID." }, { status: 400 });
   }
 
   try {
@@ -41,6 +38,7 @@ export async function PATCH(
       "pendingLeaves",
       "createdAt",
     ];
+
     const hasUpdatable = updatableFields.some((field) => field in body);
     if (!hasUpdatable) {
       return NextResponse.json(
@@ -50,7 +48,10 @@ export async function PATCH(
     }
 
     // Validate fields using UserSchema (partial, omit deletedAt and role)
-    const partialSchema = UserSchema.omit({ deletedAt: true, role: true }).partial();
+    const partialSchema = UserSchema.omit({
+      deletedAt: true,
+      role: true,
+    }).partial();
     const parsed = partialSchema.parse(body);
 
     // Check if user with same email, phone, or username exists
@@ -62,7 +63,10 @@ export async function PATCH(
       const existingUser = await UserModel.findOne(uniqueQuery);
       if (existingUser) {
         return NextResponse.json(
-          { error: "Email, phone number, or username is already in use by another user." },
+          {
+            error:
+              "Email, phone number, or username is already in use by another user.",
+          },
           { status: 409 }
         );
       }
@@ -75,7 +79,9 @@ export async function PATCH(
     }
 
     // Update user
-    const updatedUser = await UserModel.findByIdAndUpdate(id, parsed, { new: true });
+    const updatedUser = await UserModel.findByIdAndUpdate(id, parsed, {
+      new: true,
+    });
     if (!updatedUser) {
       return NextResponse.json(
         { error: "User not found. Please check the user ID." },
@@ -125,7 +131,8 @@ export async function PATCH(
     if (error instanceof ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
-    let errorMessage = "Unable to update user information. Please try again later.";
+    let errorMessage =
+      "Unable to update user information. Please try again later.";
     if (error instanceof Error) {
       errorMessage = error.message;
     }
