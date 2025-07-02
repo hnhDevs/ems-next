@@ -33,9 +33,20 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get all users excluding deleted users
+    // --- Pagination logic ---
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "25", 10);
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination info
+    const total = await UserModel.countDocuments({ deletedAt: null });
+
+    // Get paginated users
     const users = await UserModel.find({ deletedAt: null })
-      .select("-password -__v") // Exclude password and version fields
+      .select("-password -__v")
+      .skip(skip)
+      .limit(limit)
       .lean();
 
     // Transform the data to match the expected format
@@ -60,7 +71,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: formattedUsers,
-      totalUsers: formattedUsers.length,
+      count: formattedUsers.length,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      totalUsers: total,
     });
   } catch (error) {
     console.error("Error fetching all users:", error);
