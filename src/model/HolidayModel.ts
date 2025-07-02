@@ -28,7 +28,10 @@ const HolidaySchema: Schema<IHoliday> = new Schema({
     type: String,
     required: [true, "Holiday name is required"],
     trim: true,
-    match: [holidayNameRegex, "Holiday name must contain only letters and spaces."],
+    match: [
+      holidayNameRegex,
+      "Holiday name must contain only letters and spaces.",
+    ],
   },
   startDate: {
     type: Date,
@@ -54,7 +57,7 @@ const HolidaySchema: Schema<IHoliday> = new Schema({
       "Festive",
       "Observance",
       "Compensatory",
-      "Other"
+      "Other",
     ],
     default: "Other",
   },
