@@ -2,18 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { HolidayModel } from "@/model/HolidayModel";
 import { HolidaySchema } from "@/schemas/HolidaySchema";
 import { dbConnect } from "@/lib/dbConnect";
+import { parseDates } from "@/lib/dateUtils";
 
 export async function POST(req: NextRequest) {
   await dbConnect();
 
   try {
     const body = await req.json();
-    // Parse date strings to Date objects
-    if (body.startDate) body.startDate = new Date(body.startDate);
-    if (body.endDate) body.endDate = new Date(body.endDate);
+    // Parse date strings to Date objects using utility
+    const parsedBody = parseDates(body, ["startDate", "endDate"]);
 
     // Validate request body
-    const parsed = HolidaySchema.safeParse(body);
+    const parsed = HolidaySchema.safeParse(parsedBody);
     if (!parsed.success) {
       return NextResponse.json(
         {
